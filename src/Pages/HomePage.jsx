@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { NodePadProvider } from "../Hooks/NodePadContext";
-import Menu from "../components/Menu/Menu";
 import List from "../components/List/List";
+import MenuIcon from "@mui/icons-material/Menu";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import Menu from "../components/Menu/Menu";
+import { useMenu } from "../Hooks/MenuContext";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
+  const { menu, setMenu } = useMenu();
   const [notes, setNotes] = useState([]);
 
   var date = new Date();
@@ -16,10 +21,12 @@ const HomePage = () => {
     setNotes((prev) => [{ id: Date.now(), ...note, Date: FullDate }, ...prev]);
   };
 
-  const editNote = (note, id) => {
+  const editNote = (note, id, title) => {
     setNotes((prev) =>
       prev.map((prevNote) =>
-        prevNote.id === id ? { ...prevNote, note: note } : prevNote
+        prevNote.id === id
+          ? { ...prevNote, note: note, title: title }
+          : prevNote
       )
     );
   };
@@ -28,8 +35,7 @@ const HomePage = () => {
     setNotes((prev) => prev.filter((prevNode) => prevNode.id !== id));
   };
 
- 
-
+  const navigate = useNavigate();
   return (
     <NodePadProvider value={{ notes, createNote, deleteNote, editNote }}>
       <div className=" gap-[10px] flex flex-col  bg-mad py-[3px]">
@@ -40,12 +46,23 @@ const HomePage = () => {
           className="flex 
               flex-row gap-[10px] "
         >
-                  <div className="">
-                      
-            <Menu />
+          <div className="">
+            <>
+              <div className="  bg-gradient-to-r from-primary_color to-info_color overflow-hidden overflow-y-auto">
+                <button onClick={() => setMenu(!menu)}>
+                  <MenuIcon />
+                </button>
+
+                <ul className="flex flex-col gap-[30px]  h-[570px] items-stretch p-[10px] ]">
+                  <Menu />
+                </ul>
+              </div>
+            </>
           </div>
           <div className="flex w-full ">
-            <List />
+            {notes?.map((note) => (
+              <List note={note} key={note.id} />
+            ))}
           </div>
         </div>
       </div>
